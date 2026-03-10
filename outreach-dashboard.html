@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeResponse Outreach Dashboard</title>
+<style>
+:root {
+  --bg-primary: #0a0f1c;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --bg-hover: #273549;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --orange: #f97316;
+  --orange-dim: #c2590f;
+  --border: #334155;
+  --status-none: #475569;
+  --status-red: #ef4444;
+  --status-red-bg: rgba(239,68,68,0.08);
+  --status-yellow: #eab308;
+  --status-yellow-bg: rgba(234,179,8,0.08);
+  --status-green: #22c55e;
+  --status-green-bg: rgba(34,197,94,0.08);
+  --radius: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--orange);
+}
+.header h1 span { color: var(--text-primary); }
+
+/* Nav Tabs */
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+.nav-tab {
+  padding: 8px 20px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.nav-tab.active { background: var(--bg-tertiary); color: var(--orange); border-color: var(--border); }
+
+/* Header Actions */
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Buttons */
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--bg-hover); }
+.btn-primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+.btn-primary:hover { background: var(--orange-dim); }
+.btn-danger { background: #991b1b; border-color: #991b1b; color: #fff; }
+.btn-danger:hover { background: #7f1d1d; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+/* Main Content */
+.main { padding: 24px 32px; }
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.stat-card .stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+.stat-card.stat-red .stat-value { color: var(--status-red); }
+.stat-card.stat-yellow .stat-value { color: var(--status-yellow); }
+.stat-card.stat-green .stat-value { color: var(--status-green); }
+.stat-card.stat-orange .stat-value { color: var(--orange); }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-input {
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 14px;
+  width: 280px;
+  outline: none;
+}
+.search-input:focus { border-color: var(--orange); }
+.search-input::placeholder { color: var(--text-muted); }
+
+.filter-group { display: flex; gap: 4px; margin-left: 8px; }
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--text-muted); }
+.filter-btn.active { border-color: var(--orange); color: var(--orange); background: rgba(249,115,22,0.1); }
+.filter-btn .dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.filter-btn .dot.gray { background: var(--status-none); }
+.filter-btn .dot.red { background: var(--status-red); }
+.filter-btn .dot.yellow { background: var(--status-yellow); }
+.filter-btn .dot.green { background: var(--status-green); }
+
+/* Table */
+.table-wrapper {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  background: var(--bg-tertiary);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+thead th:hover { color: var(--text-primary); }
+thead th .sort-arrow { margin-left: 4px; font-size: 10px; color: var(--text-muted); }
+thead th .sort-arrow.active { color: var(--orange); }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  transition: background 0.1s;
+}
+tbody tr:hover { background: var(--bg-hover); }
+tbody tr.selected { background: rgba(249,115,22,0.06); border-left-color: var(--orange); }
+tbody tr.status-red { border-left-color: var(--status-red); background: var(--status-red-bg); }
+tbody tr.status-yellow { border-left-color: var(--status-yellow); background: var(--status-yellow-bg); }
+tbody tr.status-green { border-left-color: var(--status-green); background: var(--status-green-bg); }
+tbody tr.status-red:hover { background: rgba(239,68,68,0.14); }
+tbody tr.status-yellow:hover { background: rgba(234,179,8,0.14); }
+tbody tr.status-green:hover { background: rgba(34,197,94,0.14); }
+
+tbody td {
+  padding: 8px 12px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+/* Status Dropdown */
+.status-select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+}
+.status-select option { background: var(--bg-secondary); }
+
+/* Channel Checkboxes */
+.channel-checks { display: flex; gap: 12px; white-space: nowrap; }
+.channel-check { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.channel-check input[type="checkbox"] {
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+.channel-check .date-stamp { font-size: 10px; color: var(--text-muted); margin-left: 2px; }
+
+/* Notes cell */
+.notes-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.notes-cell:hover { color: var(--text-primary); }
+.notes-cell.empty { color: var(--text-muted); font-style: italic; }
+
+/* LinkedIn icon */
+.linkedin-link {
+  color: #0a66c2;
+  text-decoration: none;
+  font-size: 16px;
+}
+.linkedin-link:hover { color: #0077b5; }
+
+/* Action buttons */
+.row-actions { display: flex; gap: 4px; }
+
+/* Tab Panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Templates Tab */
+.templates-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.template-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.template-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--orange);
+  margin-bottom: 4px;
+}
+.template-card .template-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.template-card .template-body {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+.template-card .template-body .merge-field {
+  color: var(--orange);
+  font-weight: 600;
+}
+.template-actions { display: flex; gap: 8px; }
+
+/* Cadence Table */
+.cadence-section {
+  margin-top: 32px;
+}
+.cadence-section h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+.cadence-table {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.cadence-table table { font-size: 14px; }
+.cadence-table thead th { cursor: default; }
+.cadence-table tbody td { padding: 12px 16px; }
+.cadence-day {
+  display: inline-block;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.cadence-channel {
+  display: inline-flex;
+  gap: 6px;
+}
+.cadence-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.cadence-badge.email { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.cadence-badge.linkedin { background: rgba(10,102,194,0.15); color: #38bdf8; }
+.cadence-badge.phone { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+/* Modals */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.modal h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Form */
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--orange);
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Drag-drop zone */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--orange);
+  background: rgba(249,115,22,0.05);
+}
+.drop-zone p { color: var(--text-secondary); font-size: 14px; }
+.drop-zone .drop-icon { font-size: 36px; margin-bottom: 8px; display: block; color: var(--text-muted); }
+
+/* CSV Preview */
+.csv-preview {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 12px;
+  margin-top: 12px;
+}
+.csv-preview table { font-size: 12px; }
+.csv-preview td, .csv-preview th { padding: 4px 8px; }
+
+/* Duplicate list */
+.dup-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 12px 0;
+}
+.dup-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  padding: 12px 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 13px;
+  box-shadow: var(--shadow);
+  animation: slideIn 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.success { border-left: 3px solid var(--status-green); }
+.toast.warning { border-left: 3px solid var(--status-yellow); }
+.toast.error { border-left: 3px solid var(--status-red); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+.empty-state p { font-size: 15px; margin-bottom: 16px; }
+
+/* Selected lead indicator */
+.selected-lead-badge {
+  background: rgba(249,115,22,0.15);
+  border: 1px solid var(--orange);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--orange);
+  margin-bottom: 16px;
+  display: none;
+}
+.selected-lead-badge.visible { display: block; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>Trade<span>Response</span> Outreach</h1>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="leads" onclick="switchTab('leads')">Leads</button>
+    <button class="nav-tab" data-tab="templates" onclick="switchTab('templates')">Templates</button>
+  </div>
+  <div class="header-actions">
+    <button class="btn" onclick="openImportModal()">&#8593; Import CSV</button>
+    <button class="btn" onclick="openAddModal()">+ Add Lead</button>
+    <button class="btn" onclick="exportCSV()">&#8595; Export CSV</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- LEADS TAB -->
+  <div id="tab-leads" class="tab-panel active">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" class="search-input" id="search-input" placeholder="Search name, company, email..." oninput="debouncedSearch()">
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" data-filter="none" onclick="setFilter('none')"><span class="dot gray"></span>None</button>
+        <button class="filter-btn" data-filter="red" onclick="setFilter('red')"><span class="dot red"></span>Red</button>
+        <button class="filter-btn" data-filter="yellow" onclick="setFilter('yellow')"><span class="dot yellow"></span>Yellow</button>
+        <button class="filter-btn" data-filter="green" onclick="setFilter('green')"><span class="dot green"></span>Green</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table id="leads-table">
+        <thead>
+          <tr>
+            <th data-sort="status" onclick="sortBy('status')">Status <span class="sort-arrow" id="sort-status"></span></th>
+            <th data-sort="firstName" onclick="sortBy('firstName')">Name <span class="sort-arrow" id="sort-firstName"></span></th>
+            <th data-sort="company" onclick="sortBy('company')">Company <span class="sort-arrow" id="sort-company"></span></th>
+            <th data-sort="title" onclick="sortBy('title')">Title <span class="sort-arrow" id="sort-title"></span></th>
+            <th data-sort="email" onclick="sortBy('email')">Email <span class="sort-arrow" id="sort-email"></span></th>
+            <th data-sort="phone" onclick="sortBy('phone')">Phone <span class="sort-arrow" id="sort-phone"></span></th>
+            <th>LI</th>
+            <th>Outreach</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state">
+        <span class="empty-icon">&#128203;</span>
+        <p>No leads yet. Import an Apollo CSV or add leads manually.</p>
+        <button class="btn btn-primary" onclick="openImportModal()">&#8593; Import CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMPLATES TAB -->
+  <div id="tab-templates" class="tab-panel">
+    <div class="selected-lead-badge" id="selected-lead-badge"></div>
+    <div class="templates-container" id="templates-container"></div>
+    <div class="cadence-section">
+      <h2>Outreach Cadence</h2>
+      <div class="cadence-table">
+        <table>
+          <thead><tr><th>Day</th><th>Channel</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="cadence-day">1</span></td>
+              <td><span class="cadence-channel"><span class="cadence-badge email">Email</span><span class="cadence-badge linkedin">LinkedIn</span></span></td>
+              <td>Cold email #1 + connection request</td>
+            </tr>
+            <tr>
+              <td><span class="cadence-day">3</span></td>
+              <td><span class="cadence-channel"><span class="cadence-badge email">Email</span><span class="cadence-badge phone">Phone</span></span></td>
+              <td>Follow-up #1 + first call attempt</td>
+            </tr>
+            <tr>
+              <td><span class="cadence-day">5</span></td>
+              <td><span class="cadence-channel"><span class="cadence-badge linkedin">LinkedIn</span></span></td>
+              <td>DM if connected</td>
+            </tr>
+            <tr>
+              <td><span class="cadence-day">7</span></td>
+              <td><span class="cadence-channel"><span class="cadence-badge email">Email</span><span class="cadence-badge phone">Phone</span></span></td>
+              <td>Follow-up #2 (breakup) + second call</td>
+            </tr>
+            <tr>
+              <td><span class="cadence-day">14</span></td>
+              <td><span class="cadence-channel"><span class="cadence-badge phone">Phone</span></span></td>
+              <td>Final call / voicemail</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal" style="max-width:700px">
+    <h2>Import Apollo CSV</h2>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('csv-file-input').click()">
+      <span class="drop-icon">&#128194;</span>
+      <p>Drag & drop your Apollo CSV here, or click to browse</p>
+      <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+    <div id="import-preview" style="display:none">
+      <p style="color:var(--text-secondary);font-size:13px"><strong id="import-count">0</strong> leads found</p>
+      <div id="import-dupes" style="display:none;margin-top:12px">
+        <p style="color:var(--status-yellow);font-size:13px;margin-bottom:8px"><strong id="dupe-count">0</strong> duplicates detected:</p>
+        <div class="dup-list" id="dup-list"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-sm" onclick="setDupeAction('skip')">Skip All Duplicates</button>
+          <button class="btn btn-sm" onclick="setDupeAction('overwrite')">Overwrite All</button>
+        </div>
+      </div>
+      <div class="csv-preview" id="csv-preview-table"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('import-modal')">Cancel</button>
+      <button class="btn btn-primary" id="import-btn" onclick="confirmImport()" disabled>Import Leads</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Lead Modal -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <h2 id="lead-modal-title">Add Lead</h2>
+    <input type="hidden" id="lead-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="lead-firstName">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="lead-lastName">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="lead-email">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="lead-phone">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" id="lead-company">
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="lead-title">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>LinkedIn URL</label>
+        <input type="text" id="lead-linkedin">
+      </div>
+      <div class="form-group">
+        <label># Employees</label>
+        <input type="text" id="lead-employees">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>City</label>
+        <input type="text" id="lead-city">
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <input type="text" id="lead-state">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Industry</label>
+      <input type="text" id="lead-industry">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="lead-notes"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('lead-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notes Modal -->
+<div class="modal-overlay" id="notes-modal">
+  <div class="modal" style="max-width:500px">
+    <h2>Notes — <span id="notes-modal-name"></span></h2>
+    <input type="hidden" id="notes-lead-id">
+    <div class="form-group">
+      <textarea id="notes-textarea" rows="6"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('notes-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNotes()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px">
+    <h2>Delete Lead</h2>
+    <p style="color:var(--text-secondary);margin-bottom:8px">Are you sure you want to delete <strong id="delete-lead-name"></strong>?</p>
+    <input type="hidden" id="delete-lead-id">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ─── STATE ──────────────────────────────────────────────────
+const STORAGE_KEY = 'tr_outreach_leads';
+const STORAGE_WARN_BYTES = 4 * 1024 * 1024;
+
+let state = {
+  leads: [],
+  filter: 'all',
+  search: '',
+  sortField: 'company',
+  sortDir: 'asc',
+  selectedLeadId: null,
+};
+
+// ─── PERSISTENCE ────────────────────────────────────────────
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state.leads = JSON.parse(raw);
+  } catch (e) {
+    toast('Failed to load saved data', 'error');
+  }
+}
+
+function saveState() {
+  try {
+    const json = JSON.stringify(state.leads);
+    localStorage.setItem(STORAGE_KEY, json);
+    if (json.length > STORAGE_WARN_BYTES) {
+      toast('Storage getting large (' + (json.length / 1024 / 1024).toFixed(1) + 'MB). Consider exporting a backup.', 'warning');
+    }
+  } catch (e) {
+    toast('Failed to save — storage may be full. Export your data!', 'error');
+  }
+}
+
+// ─── CSV PARSER ─────────────────────────────────────────────
+function parseCSV(text) {
+  // Strip BOM
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  // Normalize line endings
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  const rows = [];
+  let i = 0;
+  while (i < text.length) {
+    const row = [];
+    while (i < text.length) {
+      let value = '';
+      if (text[i] === '"') {
+        // Quoted field
+        i++;
+        while (i < text.length) {
+          if (text[i] === '"') {
+            if (i + 1 < text.length && text[i + 1] === '"') {
+              value += '"';
+              i += 2;
+            } else {
+              i++; // skip closing quote
+              break;
+            }
+          } else {
+            value += text[i];
+            i++;
+          }
+        }
+        // Skip to comma or newline
+        if (i < text.length && text[i] === ',') i++;
+        else if (i < text.length && text[i] === '\n') { i++; break; }
+        else break;
+      } else {
+        // Unquoted field
+        const nextComma = text.indexOf(',', i);
+        const nextNewline = text.indexOf('\n', i);
+        let end;
+        if (nextComma === -1 && nextNewline === -1) end = text.length;
+        else if (nextComma === -1) end = nextNewline;
+        else if (nextNewline === -1) end = nextComma;
+        else end = Math.min(nextComma, nextNewline);
+
+        value = text.substring(i, end);
+        i = end;
+        if (i < text.length && text[i] === ',') { i++; }
+        else if (i < text.length && text[i] === '\n') { i++; break; }
+        else { i = text.length; break; }
+      }
+      row.push(value.trim());
+    }
+    if (row.length > 0 && row.some(c => c !== '')) rows.push(row);
+  }
+  return rows;
+}
+
+// ─── APOLLO COLUMN MAPPER ───────────────────────────────────
+function mapApolloColumns(headers) {
+  const h = headers.map(s => s.toLowerCase().trim());
+  const find = (...candidates) => {
+    for (const c of candidates) {
+      const idx = h.indexOf(c);
+      if (idx !== -1) return idx;
+    }
+    // partial match
+    for (const c of candidates) {
+      const idx = h.findIndex(x => x.includes(c));
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  };
+  return {
+    firstName: find('first name', 'first_name', 'firstname'),
+    lastName: find('last name', 'last_name', 'lastname'),
+    fullName: find('full name', 'name', 'contact name'),
+    email: find('email', 'email address', 'work email'),
+    phone: find('phone', 'phone number', 'work phone', 'mobile phone', 'corporate phone'),
+    company: find('company', 'company name', 'organization'),
+    title: find('title', 'job title', 'position'),
+    linkedin: find('linkedin url', 'linkedin', 'person linkedin url', 'linkedin profile'),
+    city: find('city', 'person city'),
+    state: find('state', 'person state'),
+    employees: find('# employees', 'employees', 'number of employees', 'company headcount'),
+    industry: find('industry', 'company industry'),
+  };
+}
+
+function normalizeLinkedIn(url) {
+  if (!url) return '';
+  url = url.trim();
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (url.startsWith('linkedin.com') || url.startsWith('www.linkedin.com')) return 'https://' + url;
+  if (url.startsWith('/in/')) return 'https://linkedin.com' + url;
+  return 'https://linkedin.com/in/' + url;
+}
+
+function rowToLead(row, map) {
+  const get = idx => (idx >= 0 && idx < row.length) ? row[idx] : '';
+  let firstName = get(map.firstName);
+  let lastName = get(map.lastName);
+  if (!firstName && !lastName && map.fullName >= 0) {
+    const parts = get(map.fullName).split(' ');
+    firstName = parts[0] || '';
+    lastName = parts.slice(1).join(' ') || '';
+  }
+  return {
+    id: crypto.randomUUID(),
+    firstName,
+    lastName,
+    email: get(map.email),
+    phone: get(map.phone),
+    company: get(map.company),
+    title: get(map.title),
+    linkedin: normalizeLinkedIn(get(map.linkedin)),
+    city: get(map.city),
+    state: get(map.state),
+    employees: get(map.employees),
+    industry: get(map.industry),
+    status: 'none',
+    emailSent: null,
+    linkedinSent: null,
+    called: null,
+    notes: '',
+    createdAt: new Date().toISOString(),
+  };
+}
+
+// ─── DUPLICATE DETECTION ────────────────────────────────────
+function findDuplicate(lead) {
+  if (lead.email) {
+    const match = state.leads.find(l => l.email && l.email.toLowerCase() === lead.email.toLowerCase());
+    if (match) return match;
+  }
+  if (lead.company && lead.phone) {
+    const match = state.leads.find(l =>
+      l.company && l.phone &&
+      l.company.toLowerCase() === lead.company.toLowerCase() &&
+      l.phone.replace(/\D/g, '') === lead.phone.replace(/\D/g, '')
+    );
+    if (match) return match;
+  }
+  return null;
+}
+
+// ─── IMPORT LOGIC ───────────────────────────────────────────
+let pendingImport = { newLeads: [], duplicates: [], dupeAction: 'skip' };
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  processFile(file);
+}
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const rows = parseCSV(e.target.result);
+    if (rows.length < 2) { toast('CSV appears empty', 'warning'); return; }
+    const headers = rows[0];
+    const map = mapApolloColumns(headers);
+
+    // Check if we found key columns
+    const found = Object.entries(map).filter(([k, v]) => v >= 0).map(([k]) => k);
+    if (!found.includes('email') && !found.includes('company')) {
+      toast('Could not detect email or company columns. Check CSV format.', 'warning');
+    }
+
+    const newLeads = [];
+    const duplicates = [];
+    for (let i = 1; i < rows.length; i++) {
+      const lead = rowToLead(rows[i], map);
+      if (!lead.firstName && !lead.lastName && !lead.company && !lead.email) continue;
+      const dup = findDuplicate(lead);
+      if (dup) {
+        duplicates.push({ incoming: lead, existing: dup });
+      } else {
+        // Also check within the import batch
+        const batchDup = newLeads.find(l =>
+          (l.email && lead.email && l.email.toLowerCase() === lead.email.toLowerCase()) ||
+          (l.company && l.phone && lead.company && lead.phone &&
+           l.company.toLowerCase() === lead.company.toLowerCase() &&
+           l.phone.replace(/\D/g, '') === lead.phone.replace(/\D/g, ''))
+        );
+        if (!batchDup) newLeads.push(lead);
+      }
+    }
+
+    pendingImport = { newLeads, duplicates, dupeAction: 'skip' };
+
+    document.getElementById('import-count').textContent = newLeads.length;
+    document.getElementById('import-preview').style.display = 'block';
+    document.getElementById('import-btn').disabled = false;
+
+    if (duplicates.length > 0) {
+      document.getElementById('import-dupes').style.display = 'block';
+      document.getElementById('dupe-count').textContent = duplicates.length;
+      const list = document.getElementById('dup-list');
+      list.innerHTML = duplicates.map(d =>
+        '<div class="dup-item"><span>' + esc(d.incoming.firstName + ' ' + d.incoming.lastName) + ' — ' + esc(d.incoming.company) + '</span><span style="color:var(--text-muted);font-size:11px">matches ' + esc(d.existing.email || d.existing.company) + '</span></div>'
+      ).join('');
+    } else {
+      document.getElementById('import-dupes').style.display = 'none';
+    }
+
+    // Preview table
+    const previewRows = newLeads.slice(0, 5);
+    let html = '<table><thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th></tr></thead><tbody>';
+    previewRows.forEach(l => {
+      html += '<tr><td>' + esc(l.firstName + ' ' + l.lastName) + '</td><td>' + esc(l.company) + '</td><td>' + esc(l.email) + '</td><td>' + esc(l.phone) + '</td></tr>';
+    });
+    if (newLeads.length > 5) html += '<tr><td colspan="4" style="color:var(--text-muted)">...and ' + (newLeads.length - 5) + ' more</td></tr>';
+    html += '</tbody></table>';
+    document.getElementById('csv-preview-table').innerHTML = html;
+  };
+  reader.readAsText(file);
+}
+
+function setDupeAction(action) {
+  pendingImport.dupeAction = action;
+  document.querySelectorAll('#import-dupes .btn').forEach(b => b.style.opacity = '0.5');
+  event.target.style.opacity = '1';
+  toast(action === 'skip' ? 'Will skip duplicates' : 'Will overwrite duplicates', 'success');
+}
+
+function confirmImport() {
+  let added = 0;
+  // Add new leads
+  state.leads.push(...pendingImport.newLeads);
+  added = pendingImport.newLeads.length;
+
+  // Handle dupes
+  if (pendingImport.dupeAction === 'overwrite') {
+    pendingImport.duplicates.forEach(d => {
+      const idx = state.leads.findIndex(l => l.id === d.existing.id);
+      if (idx >= 0) {
+        d.incoming.id = d.existing.id;
+        d.incoming.status = d.existing.status;
+        d.incoming.emailSent = d.existing.emailSent;
+        d.incoming.linkedinSent = d.existing.linkedinSent;
+        d.incoming.called = d.existing.called;
+        d.incoming.notes = d.existing.notes;
+        state.leads[idx] = d.incoming;
+        added++;
+      }
+    });
+  }
+
+  saveState();
+  render();
+  closeModal('import-modal');
+  toast(added + ' leads imported!', 'success');
+  // Reset
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('csv-file-input').value = '';
+  pendingImport = { newLeads: [], duplicates: [], dupeAction: 'skip' };
+}
+
+// ─── DRAG & DROP ────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.csv')) processFile(file);
+  else toast('Please drop a .csv file', 'warning');
+});
+
+// ─── RENDER ─────────────────────────────────────────────────
+function render() {
+  renderStats();
+  renderTable();
+}
+
+function renderStats() {
+  const leads = state.leads;
+  const total = leads.length;
+  const red = leads.filter(l => l.status === 'red').length;
+  const yellow = leads.filter(l => l.status === 'yellow').length;
+  const green = leads.filter(l => l.status === 'green').length;
+  const emailsSent = leads.filter(l => l.emailSent).length;
+  const liSent = leads.filter(l => l.linkedinSent).length;
+  const calls = leads.filter(l => l.called).length;
+  const rate = total > 0 ? ((green / total) * 100).toFixed(1) : '0.0';
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Leads</div></div>
+    <div class="stat-card stat-red"><div class="stat-value">${red}</div><div class="stat-label">Red</div></div>
+    <div class="stat-card stat-yellow"><div class="stat-value">${yellow}</div><div class="stat-label">Yellow</div></div>
+    <div class="stat-card stat-green"><div class="stat-value">${green}</div><div class="stat-label">Green</div></div>
+    <div class="stat-card"><div class="stat-value">${emailsSent}</div><div class="stat-label">Emails Sent</div></div>
+    <div class="stat-card"><div class="stat-value">${liSent}</div><div class="stat-label">LinkedIn DMs</div></div>
+    <div class="stat-card"><div class="stat-value">${calls}</div><div class="stat-label">Calls Made</div></div>
+    <div class="stat-card stat-orange"><div class="stat-value">${rate}%</div><div class="stat-label">Conversion</div></div>
+  `;
+}
+
+function getFilteredLeads() {
+  let leads = state.leads;
+  // Filter by status
+  if (state.filter !== 'all') {
+    leads = leads.filter(l => l.status === state.filter);
+  }
+  // Search
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    leads = leads.filter(l =>
+      (l.firstName + ' ' + l.lastName).toLowerCase().includes(q) ||
+      (l.company || '').toLowerCase().includes(q) ||
+      (l.email || '').toLowerCase().includes(q)
+    );
+  }
+  // Sort
+  leads = [...leads].sort((a, b) => {
+    const statusOrder = { none: 0, green: 1, yellow: 2, red: 3 };
+    let va, vb;
+    if (state.sortField === 'status') {
+      va = statusOrder[a.status] || 0;
+      vb = statusOrder[b.status] || 0;
+    } else {
+      va = (a[state.sortField] || '').toLowerCase();
+      vb = (b[state.sortField] || '').toLowerCase();
+    }
+    if (va < vb) return state.sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return state.sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return leads;
+}
+
+function renderTable() {
+  const leads = getFilteredLeads();
+  const tbody = document.getElementById('leads-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (state.leads.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  if (leads.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted)">No leads match your filters</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = leads.map(l => {
+    const sel = l.id === state.selectedLeadId ? ' selected' : '';
+    const statusClass = l.status !== 'none' ? ' status-' + l.status : '';
+    const name = esc(l.firstName + (l.lastName ? ' ' + l.lastName : ''));
+    const liIcon = l.linkedin ? '<a href="' + esc(l.linkedin) + '" target="_blank" class="linkedin-link" title="Open LinkedIn">in</a>' : '<span style="color:var(--text-muted)">—</span>';
+
+    return `<tr class="${statusClass}${sel}" onclick="selectLead('${l.id}')" data-id="${l.id}">
+      <td>
+        <select class="status-select" onchange="changeStatus('${l.id}', this.value)" onclick="event.stopPropagation()">
+          <option value="none"${l.status === 'none' ? ' selected' : ''}>None</option>
+          <option value="red"${l.status === 'red' ? ' selected' : ''}>&#128308; Red</option>
+          <option value="yellow"${l.status === 'yellow' ? ' selected' : ''}>&#128993; Yellow</option>
+          <option value="green"${l.status === 'green' ? ' selected' : ''}>&#128994; Green</option>
+        </select>
+      </td>
+      <td><strong>${name}</strong></td>
+      <td>${esc(l.company)}</td>
+      <td style="color:var(--text-secondary);font-size:12px">${esc(l.title)}</td>
+      <td style="font-size:12px">${esc(l.email)}</td>
+      <td style="font-size:12px">${esc(l.phone)}</td>
+      <td>${liIcon}</td>
+      <td>
+        <div class="channel-checks" onclick="event.stopPropagation()">
+          <label class="channel-check">
+            <input type="checkbox" ${l.emailSent ? 'checked' : ''} onchange="toggleChannel('${l.id}','emailSent',this.checked)">
+            E${l.emailSent ? '<span class="date-stamp">' + fmtDate(l.emailSent) + '</span>' : ''}
+          </label>
+          <label class="channel-check">
+            <input type="checkbox" ${l.linkedinSent ? 'checked' : ''} onchange="toggleChannel('${l.id}','linkedinSent',this.checked)">
+            LI${l.linkedinSent ? '<span class="date-stamp">' + fmtDate(l.linkedinSent) + '</span>' : ''}
+          </label>
+          <label class="channel-check">
+            <input type="checkbox" ${l.called ? 'checked' : ''} onchange="toggleChannel('${l.id}','called',this.checked)">
+            Ph${l.called ? '<span class="date-stamp">' + fmtDate(l.called) + '</span>' : ''}
+          </label>
+        </div>
+      </td>
+      <td>
+        <div class="notes-cell${l.notes ? '' : ' empty'}" onclick="event.stopPropagation();openNotesModal('${l.id}')">${l.notes ? esc(l.notes) : 'Add note...'}</div>
+      </td>
+      <td>
+        <div class="row-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-sm" onclick="openEditModal('${l.id}')" title="Edit">&#9998;</button>
+          <button class="btn btn-sm" onclick="openDeleteModal('${l.id}')" title="Delete">&#10005;</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Update sort arrows
+  document.querySelectorAll('.sort-arrow').forEach(el => {
+    el.textContent = '';
+    el.classList.remove('active');
+  });
+  const arrow = document.getElementById('sort-' + state.sortField);
+  if (arrow) {
+    arrow.textContent = state.sortDir === 'asc' ? ' \u25B2' : ' \u25BC';
+    arrow.classList.add('active');
+  }
+}
+
+// ─── INTERACTIONS ───────────────────────────────────────────
+function selectLead(id) {
+  state.selectedLeadId = state.selectedLeadId === id ? null : id;
+  renderTable();
+  updateSelectedBadge();
+}
+
+function updateSelectedBadge() {
+  const badge = document.getElementById('selected-lead-badge');
+  if (state.selectedLeadId) {
+    const l = state.leads.find(x => x.id === state.selectedLeadId);
+    if (l) {
+      badge.textContent = 'Selected: ' + l.firstName + ' ' + (l.lastName || '') + ' — ' + (l.company || '');
+      badge.classList.add('visible');
+      return;
+    }
+  }
+  badge.classList.remove('visible');
+}
+
+function changeStatus(id, status) {
+  const lead = state.leads.find(l => l.id === id);
+  if (lead) { lead.status = status; saveState(); render(); }
+}
+
+function toggleChannel(id, field, checked) {
+  const lead = state.leads.find(l => l.id === id);
+  if (lead) {
+    lead[field] = checked ? new Date().toISOString() : null;
+    saveState();
+    render();
+  }
+}
+
+function sortBy(field) {
+  if (state.sortField === field) {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.sortField = field;
+    state.sortDir = 'asc';
+  }
+  renderTable();
+}
+
+let searchTimeout;
+function debouncedSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    state.search = document.getElementById('search-input').value;
+    renderTable();
+  }, 200);
+}
+
+function setFilter(f) {
+  state.filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  renderTable();
+}
+
+// ─── MODALS ─────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function openImportModal() {
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-btn').disabled = true;
+  document.getElementById('csv-file-input').value = '';
+  openModal('import-modal');
+}
+
+function openAddModal() {
+  document.getElementById('lead-modal-title').textContent = 'Add Lead';
+  document.getElementById('lead-edit-id').value = '';
+  ['firstName','lastName','email','phone','company','title','linkedin','employees','city','state','industry','notes'].forEach(f => {
+    document.getElementById('lead-' + f).value = '';
+  });
+  openModal('lead-modal');
+}
+
+function openEditModal(id) {
+  const lead = state.leads.find(l => l.id === id);
+  if (!lead) return;
+  document.getElementById('lead-modal-title').textContent = 'Edit Lead';
+  document.getElementById('lead-edit-id').value = id;
+  ['firstName','lastName','email','phone','company','title','linkedin','employees','city','state','industry','notes'].forEach(f => {
+    document.getElementById('lead-' + f).value = lead[f] || '';
+  });
+  openModal('lead-modal');
+}
+
+function saveLead() {
+  const id = document.getElementById('lead-edit-id').value;
+  const data = {};
+  ['firstName','lastName','email','phone','company','title','linkedin','employees','city','state','industry','notes'].forEach(f => {
+    data[f] = document.getElementById('lead-' + f).value;
+  });
+  data.linkedin = normalizeLinkedIn(data.linkedin);
+
+  if (id) {
+    const lead = state.leads.find(l => l.id === id);
+    if (lead) Object.assign(lead, data);
+  } else {
+    state.leads.push({
+      id: crypto.randomUUID(),
+      ...data,
+      status: 'none',
+      emailSent: null,
+      linkedinSent: null,
+      called: null,
+      createdAt: new Date().toISOString(),
+    });
+  }
+  saveState();
+  render();
+  closeModal('lead-modal');
+  toast(id ? 'Lead updated' : 'Lead added', 'success');
+}
+
+function openNotesModal(id) {
+  const lead = state.leads.find(l => l.id === id);
+  if (!lead) return;
+  document.getElementById('notes-lead-id').value = id;
+  document.getElementById('notes-modal-name').textContent = lead.firstName + ' ' + (lead.lastName || '');
+  document.getElementById('notes-textarea').value = lead.notes || '';
+  openModal('notes-modal');
+  setTimeout(() => document.getElementById('notes-textarea').focus(), 100);
+}
+
+function saveNotes() {
+  const id = document.getElementById('notes-lead-id').value;
+  const lead = state.leads.find(l => l.id === id);
+  if (lead) {
+    lead.notes = document.getElementById('notes-textarea').value;
+    saveState();
+    render();
+  }
+  closeModal('notes-modal');
+}
+
+function openDeleteModal(id) {
+  const lead = state.leads.find(l => l.id === id);
+  if (!lead) return;
+  document.getElementById('delete-lead-id').value = id;
+  document.getElementById('delete-lead-name').textContent = lead.firstName + ' ' + (lead.lastName || '') + ' (' + (lead.company || '') + ')';
+  openModal('delete-modal');
+}
+
+function confirmDelete() {
+  const id = document.getElementById('delete-lead-id').value;
+  state.leads = state.leads.filter(l => l.id !== id);
+  if (state.selectedLeadId === id) state.selectedLeadId = null;
+  saveState();
+  render();
+  closeModal('delete-modal');
+  toast('Lead deleted', 'success');
+}
+
+// ─── EXPORT ─────────────────────────────────────────────────
+function exportCSV() {
+  if (state.leads.length === 0) { toast('No leads to export', 'warning'); return; }
+  const headers = ['First Name','Last Name','Email','Phone','Company','Title','LinkedIn URL','City','State','# Employees','Industry','Status','Email Sent','LinkedIn Sent','Called','Notes','Created At'];
+  const rows = state.leads.map(l => [
+    l.firstName, l.lastName, l.email, l.phone, l.company, l.title, l.linkedin,
+    l.city, l.state, l.employees, l.industry, l.status,
+    l.emailSent || '', l.linkedinSent || '', l.called || '', l.notes, l.createdAt
+  ]);
+  const csvContent = [headers, ...rows].map(row =>
+    row.map(cell => '"' + String(cell || '').replace(/"/g, '""') + '"').join(',')
+  ).join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'traderesponse-leads-' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('CSV exported!', 'success');
+}
+
+// ─── TEMPLATES ──────────────────────────────────────────────
+const templates = [
+  {
+    name: 'Cold Email #1',
+    meta: 'Day 1 — First touch',
+    body: `Subject: Quick question about missed calls at {{company}}
+
+Hi {{first_name}},
+
+I've been talking to a lot of HVAC and plumbing companies in Denver, and one thing keeps coming up — missed calls during busy season are silently killing revenue.
+
+We built TradeResponse specifically for trades contractors. It picks up every call 24/7, books jobs on your calendar, and sends follow-up texts — so you never lose a lead to voicemail again.
+
+Would it make sense to do a quick 15-minute demo this week? Happy to show you how it works with your existing setup.
+
+Best,
+Colton King
+TradeResponse`
+  },
+  {
+    name: 'Follow-Up #1',
+    meta: 'Day 3 — Stat-driven nudge',
+    body: `Subject: Re: Quick question about missed calls at {{company}}
+
+Hi {{first_name}},
+
+Just following up on my last email. Here's a stat that usually gets attention:
+
+The average contractor loses 30-50% of inbound calls to voicemail. At $500+ per job, that adds up fast.
+
+TradeResponse answers every call, qualifies the lead, and books the appointment — no new staff needed.
+
+Worth a 15-minute look?
+
+Best,
+Colton King
+TradeResponse`
+  },
+  {
+    name: 'Follow-Up #2 (Breakup)',
+    meta: 'Day 7 — Soft close',
+    body: `Subject: Closing the loop — {{company}}
+
+Hi {{first_name}},
+
+I don't want to be a pest, so I'll keep this short. If now's not the right time, totally understand.
+
+But if missed calls or slow follow-up is something {{company}} deals with, I'd love to show you how we fix that in under a week — no contracts, cancel anytime.
+
+Either way, I wish you a great rest of your quarter.
+
+Colton King
+TradeResponse`
+  },
+  {
+    name: 'LinkedIn Connection Request',
+    meta: 'Day 1 — No pitch, just connect',
+    body: `Hi {{first_name}} — I work with HVAC and plumbing companies in the Denver area. Would love to connect and stay in touch!`
+  },
+  {
+    name: 'LinkedIn Follow-Up DM',
+    meta: 'Day 5 — After they accept',
+    body: `Thanks for connecting, {{first_name}}! I noticed {{company}} is doing great work in the Denver market.
+
+Quick question — are you all set with handling after-hours calls and booking, or is that something you'd want to tighten up? We help contractors capture every lead 24/7 without hiring extra staff.
+
+Happy to share more if it's relevant — no pressure either way.`
+  },
+  {
+    name: 'Call Script',
+    meta: 'Phone — Opener + objection handling',
+    body: `OPENER:
+"Hi {{first_name}}, this is Colton from TradeResponse — we help HVAC and plumbing companies in Denver make sure they never miss a call. Do you have 60 seconds?"
+
+PAIN QUESTION:
+"Quick question — when your guys are on a job and the phone rings, what happens to that call right now?"
+
+BRIDGE:
+"That's exactly what we solve. TradeResponse is an AI receptionist built for trades — it answers every call 24/7, qualifies the lead, and books the job on your calendar automatically."
+
+SOCIAL PROOF:
+"We're working with contractors in the Denver area who were losing 30-40% of their calls to voicemail. Most see ROI in the first week."
+
+ASK:
+"Would it make sense to do a quick 15-minute demo so I can show you how it works with your setup?"
+
+OBJECTION — "Not interested":
+"Totally fair — can I ask, is it because you're already covered on the call-handling side, or just bad timing?"
+
+OBJECTION — "We have a receptionist":
+"That's great! A lot of our clients do too. We typically handle the overflow — nights, weekends, lunch breaks — the calls your receptionist can't get to."
+
+OBJECTION — "Send me info":
+"Happy to! What's the best email? I'll send a quick overview — and if it looks relevant, we can set up 15 minutes to walk through it live."`
+  }
+];
+
+function renderTemplates() {
+  const container = document.getElementById('templates-container');
+  container.innerHTML = templates.map((t, i) => {
+    const bodyHtml = esc(t.body).replace(/\{\{(\w+)\}\}/g, '<span class="merge-field">{{$1}}</span>');
+    return `<div class="template-card">
+      <h3>${esc(t.name)}</h3>
+      <div class="template-meta">${esc(t.meta)}</div>
+      <div class="template-body">${bodyHtml}</div>
+      <div class="template-actions">
+        <button class="btn btn-sm btn-primary" onclick="copyTemplate(${i})">Copy to Clipboard</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyTemplate(idx) {
+  let text = templates[idx].body;
+  if (state.selectedLeadId) {
+    const l = state.leads.find(x => x.id === state.selectedLeadId);
+    if (l) {
+      text = text.replace(/\{\{first_name\}\}/g, l.firstName || '');
+      text = text.replace(/\{\{company\}\}/g, l.company || '');
+    }
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    toast('Template copied!' + (state.selectedLeadId ? ' (merge fields filled)' : ''), 'success');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Template copied!', 'success');
+  });
+}
+
+// ─── TABS ───────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  if (tab === 'templates') updateSelectedBadge();
+}
+
+// ─── UTILITIES ──────────────────────────────────────────────
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return (d.getMonth() + 1) + '/' + d.getDate();
+}
+
+function toast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// ─── KEYBOARD SHORTCUTS ─────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+  }
+});
+
+// ─── INIT ───────────────────────────────────────────────────
+loadState();
+render();
+renderTemplates();
+</script>
+</body>
+</html>
